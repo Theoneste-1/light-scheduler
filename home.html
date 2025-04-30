@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MQTT Light Scheduler</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f3;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 { color: #2c3e50; }
+    label, input, button {
+      font-size: 18px;
+      margin: 10px;
+    }
+    input[type="time"] {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Light Schedule Dashboard</h1>
+  <label for="onTime">ON Time:</label>
+  <input type="time" id="onTime"><br>
+  <label for="offTime">OFF Time:</label>
+  <input type="time" id="offTime"><br>
+  <button onclick="submitSchedule()">Submit</button>
+  <div id="status">Status: Not sent</div>
+
+  <script>
+    const ws = new WebSocket("ws://localhost:6789");
+
+    ws.onopen = () => {
+      document.getElementById("status").innerText = "WebSocket Connected";
+    };
+
+    function submitSchedule() {
+      const on = document.getElementById("onTime").value;
+      const off = document.getElementById("offTime").value;
+      if (on && off) {
+        ws.send(JSON.stringify({ on, off }));
+        document.getElementById("status").innerText = `Sent: ON @ ${on}, OFF @ ${off}`;
+      } else {
+        alert("Please select both times.");
+      }
+    }
+  </script>
+</body>
+</html>
